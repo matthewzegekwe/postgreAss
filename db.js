@@ -1,20 +1,27 @@
-import { Pool } from 'pg';
+// db.js
+import pg from 'pg';
+import dotenv from 'dotenv'; // Import dotenv
+
+dotenv.config(); // Load environment variables from .env file
+
+const { Pool } = pg;
 
 const pool = new Pool({
-    user: 'postgres', // Your PostgreSQL username
-    host: 'localhost', // Hostname or IP address of your PostgreSQL server
-    database: 'zegemath-user', // Your database name
-    password: 'Zegemath1*', // Your PostgreSQL password
-    port: 5432, // PostgreSQL default port
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
 });
 
-// Test the database connection
-pool.connect()
-    .then(() => {
-        console.log('Connected to PostgreSQL database');
-    })
-    .catch((err) => {
-        console.error('Database connection failed:', err.stack);
-    });
+pool.on('connect', () => {
+    console.log('Connected to the PostgreSQL database!');
+});
+
+pool.on('error', (err) => {
+    console.error('Error connecting to the database:', err.message);
+    // In a production environment, you might want to exit the process
+    // process.exit(1);
+});
 
 export default pool;
